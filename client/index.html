@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Leaflet GeoJSON from PostGIS</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+</head>
+<body>
+<div id="map" style="width: 600px; height: 400px"></div>
+
+<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.4/zepto.min.js"></script>
+<script>
+var map = L.map('map').setView([0, 0], 3);
+function onEachFeature(feature, layer) {
+	var popupContent;
+	if (feature.properties && feature.properties.name) {
+		popupContent = feature.properties.name;
+	}
+	layer.bindPopup(popupContent);
+}
+$.ajax({
+    type: "GET",
+    url: "http://localhost:3000/api",
+    dataType: 'json',
+    success: function (response) {
+		var points = response;
+		L.geoJson(points, {
+			onEachFeature: onEachFeature,
+			pointToLayer: function (feature, latlng) {
+				return L.marker([latlng.lat, latlng.lng]);
+			}
+		}).addTo(map);
+    }
+});
+
+
+</script>
+</body>
+</html>
+
